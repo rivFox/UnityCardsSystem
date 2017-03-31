@@ -33,6 +33,12 @@ public class CardMoveController : MonoBehaviour
     private float _timeStartedMoving;
     private float _timeTakenDuringMove;
 
+    private Vector3 oldCursorPosition;
+
+    //Zmienne testowe
+    public bool debugDDMode = true;
+    private bool _debugDD = false;
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
@@ -50,6 +56,7 @@ public class CardMoveController : MonoBehaviour
             _distance = Vector3.Distance(transform.position, Camera.main.transform.position);
             _dragging = true;
             StartActive();
+            //Cursor.visible = false;
         }
     }
 
@@ -57,12 +64,12 @@ public class CardMoveController : MonoBehaviour
     {
         _dragging = false;
         _cardActivated = false;
-        StopActive(); 
+        StopActive();
+        Cursor.visible = true;
     }
 
     void DDMoving()
     {
-        Debug.Log(_dragging);
         if (_dragging)
         {
             if(!_cardActivated)
@@ -73,10 +80,13 @@ public class CardMoveController : MonoBehaviour
                     _cardActivated = true;
                 }   
             }
-            _distance = Vector3.Distance(new Vector3(transform.position.x, 1f, transform.position.z), Camera.main.transform.position);
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            Vector3 rayPoint = ray.GetPoint(_distance);
-            transform.position = new Vector3(rayPoint.x, transform.position.y, rayPoint.z);
+            if(debugDDMode || (!debugDDMode && _cardActivated))
+            {
+                _distance = Vector3.Distance(new Vector3(transform.position.x, 1f, transform.position.z), Camera.main.transform.position);
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                Vector3 rayPoint = ray.GetPoint(_distance);
+                transform.position = new Vector3(rayPoint.x, transform.position.y, rayPoint.z);
+            }
         }
         else
         {
@@ -119,6 +129,7 @@ public class CardMoveController : MonoBehaviour
 
     void StartActive()
     {
+        oldCursorPosition = Input.mousePosition;
         StartMoving(new Vector3(transform.position.x, 1f, transform.position.z));
     }
 
@@ -158,7 +169,7 @@ public class CardMoveController : MonoBehaviour
         _startRotation = transform.rotation;
         _endRotation = targetRotation;
 
-        _timeTakenDuringMove = Vector3.Magnitude(_startPosition - _endPosition) / movementSpeed;
+        _timeTakenDuringMove = Vector3.Magnitude(_startPosition - _endPosition);
     }
 
     IEnumerator Moving()
@@ -167,7 +178,7 @@ public class CardMoveController : MonoBehaviour
         {
             float timeSinceStarted = Time.time - _timeStartedMoving;
             float percentageComplete = timeSinceStarted / _timeTakenDuringMove;
-            transform.position = Vector3.Lerp(transform.position, _endPosition, curveMovementSpeed.Evaluate(percentageComplete));
+            transform.position = Vector3.Lerp(_startPosition, _endPosition, curveMovementSpeed.Evaluate(percentageComplete));
             transform.rotation = Quaternion.Lerp(_startRotation, _endRotation, curveRotationSpeed.Evaluate(percentageComplete));
             if (percentageComplete >= 1.0f)
             {

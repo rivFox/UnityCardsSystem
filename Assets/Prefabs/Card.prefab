@@ -299,7 +299,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
-  movementSpeed: 1
+  movementSpeed: 2
   curveRotationSpeed:
     serializedVersion: 2
     m_Curve:
@@ -318,6 +318,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
+  debugDDMode: 1
 --- !u!114 &114772616859137864
 MonoBehaviour:
   m_ObjectHideFlags: 1
